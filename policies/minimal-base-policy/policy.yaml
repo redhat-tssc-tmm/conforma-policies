@@ -1,0 +1,22 @@
+---
+# Minimal Base Policy
+#
+# Baseline validation using the @minimal conforma rule collection.
+# This is intentionally permissive — it validates basic image integrity
+# without requiring hermetic builds, specific task lists, or signing.
+#
+# Expand by adding more include entries or creating a stricter policy
+# in a sibling directory.
+
+sources:
+  - name: minimal-baseline
+    policy:
+      - oci::quay.io/conforma/release-policy:latest
+    config:
+      include:
+        - "@minimal"
+      exclude:
+        # Not using hermetic builds yet
+        - hermetic_build_task
+        # Custom required task list not configured yet
+        - tasks.required_tasks_found

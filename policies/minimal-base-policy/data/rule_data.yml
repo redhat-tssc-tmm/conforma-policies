@@ -1,0 +1,11 @@
+---
+# Custom rule data overrides for minimal-base-policy
+#
+# Add key-value pairs here to override default rule data from the
+# upstream conforma release-policy bundle.
+#
+# Example:
+#   allowed_registry_prefixes:
+#     - quay.io/
+#     - registry.redhat.io/
+#     - registry.access.redhat.com/
