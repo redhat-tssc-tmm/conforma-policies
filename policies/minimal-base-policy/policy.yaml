@@ -1,22 +1,16 @@
 ---
 # Minimal Base Policy
 #
-# Baseline validation using the @minimal conforma rule collection.
-# This is intentionally permissive — it validates basic image integrity
-# without requiring hermetic builds, specific task lists, or signing.
+# Relies on EC's built-in signature and attestation checks (always
+# evaluated regardless of policy sources). The empty sources list
+# means no additional Rego rules are loaded — only the built-in
+# checks run:
+#   - builtin.attestation.signature_check
+#   - builtin.attestation.syntax_check
+#   - builtin.image.signature_check
 #
-# Expand by adding more include entries or creating a stricter policy
-# in a sibling directory.
+# To add custom Rego rules, add a file::rules/ source.
+# To add upstream conforma rules, add an oci:: source with a version
+# compatible with the ec binary on the cluster.
 
-sources:
-  - name: minimal-baseline
-    policy:
-      - oci::quay.io/conforma/release-policy:latest
-    config:
-      include:
-        - "@minimal"
-      exclude:
-        # Not using hermetic builds yet
-        - hermetic_build_task
-        # Custom required task list not configured yet
-        - tasks.required_tasks_found
+sources: []
