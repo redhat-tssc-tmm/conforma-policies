@@ -1,0 +1,5 @@
+---
+sources:
+  - name: parasol-software-supply-chain
+    policy:
+      - "git::http://gitlab.gitlab.svc/parasol/conforma-policies.git//policies/parasol-software-supply-chain?ref=main"
