@@ -8,8 +8,8 @@ import rego.v1
 #   Per Parasol company policy, the build must include the
 #   acs-image-scan task in the pipeline.
 # custom:
-#   short_name: acs_image_scan_task_present
-#   failure_msg: Required task 'acs-image-scan' not found in attestation
+#   short_name: task_present
+#   failure_msg: "Required task acs-image-scan not found in attestation"
 deny contains result if {
 	every att in input.attestations {
 		not _task_ran(att, "acs-image-scan")
@@ -18,13 +18,12 @@ deny contains result if {
 }
 
 # METADATA
-# title: No critical vulnerabilities in image
+# title: Image vulnerability summary
 # description: >-
-#   Images with critical vulnerabilities should be reviewed
-#   before production release.
+#   Reports vulnerability counts by severity from the ACS image scan.
 # custom:
-#   short_name: acs_image_scan_no_critical
-#   failure_msg: "ACS image scan found critical vulnerabilities: %s"
+#   short_name: vulnerability_summary
+#   failure_msg: "Vulnerabilities detected in image"
 warn contains result if {
 	some att in input.attestations
 	some task in att.statement.predicate.buildConfig.tasks
@@ -33,8 +32,9 @@ warn contains result if {
 	r.name == "SCAN_OUTPUT"
 	scan := json.unmarshal(r.value)
 	vulns := scan.vulnerabilities
-	to_number(vulns.critical) > 0
-	result := {"msg": sprintf("ACS image scan found %s critical vulnerabilities", [vulns.critical])}
+	total := to_number(vulns.critical) + to_number(vulns.high) + to_number(vulns.medium) + to_number(vulns.low)
+	total > 0
+	result := {"msg": sprintf("Vulnerabilities found — Critical: %s, High: %s, Medium: %s, Low: %s", [vulns.critical, vulns.high, vulns.medium, vulns.low])}
 }
 
 _task_ran(att, name) if {

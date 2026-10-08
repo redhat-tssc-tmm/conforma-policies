@@ -8,8 +8,8 @@ import rego.v1
 #   Per Parasol company policy, the build must include the
 #   sonar-scan task in the pipeline.
 # custom:
-#   short_name: sonarqube_task_present
-#   failure_msg: Required task 'sonar-scan' not found in attestation
+#   short_name: task_present
+#   failure_msg: "Required task sonar-scan not found in attestation"
 deny contains result if {
 	every att in input.attestations {
 		not _task_ran(att, "sonar-scan")
@@ -23,8 +23,8 @@ deny contains result if {
 #   Per Parasol company policy, the image must pass the
 #   SonarQube quality gate before promotion.
 # custom:
-#   short_name: sonarqube_quality_gate_passed
-#   failure_msg: "SonarQube quality gate FAILED: %s"
+#   short_name: quality_gate_passed
+#   failure_msg: "SonarQube quality gate FAILED"
 deny contains result if {
 	some att in input.attestations
 	some task in att.statement.predicate.buildConfig.tasks
@@ -37,12 +37,30 @@ deny contains result if {
 }
 
 # METADATA
+# title: SonarQube analysis summary
+# description: >-
+#   Reports key SonarQube metrics from the quality gate analysis.
+# custom:
+#   short_name: analysis_summary
+#   failure_msg: "SonarQube analysis summary"
+warn contains result if {
+	some att in input.attestations
+	some task in att.statement.predicate.buildConfig.tasks
+	task.name == "sonar-scan"
+	some r in task.results
+	r.name == "SONAR_QUALITY_RESULT"
+	qd := json.unmarshal(r.value)
+	metrics := qd.metrics
+	result := {"msg": sprintf("SonarQube: Bugs: %s, Vulnerabilities: %s, Code Smells: %s, Coverage: %s%%, Duplications: %s%%, Security Hotspots: %s", [metrics.bugs, metrics.vulnerabilities, metrics.code_smells, metrics.coverage, metrics.duplicated_lines_density, metrics.security_hotspots])}
+}
+
+# METADATA
 # title: SonarQube quality conditions met
 # description: >-
 #   Individual SonarQube quality conditions should pass.
 # custom:
-#   short_name: sonarqube_conditions_met
-#   failure_msg: "SonarQube condition failed: %s"
+#   short_name: conditions_met
+#   failure_msg: "SonarQube condition failed"
 warn contains result if {
 	some att in input.attestations
 	some task in att.statement.predicate.buildConfig.tasks
