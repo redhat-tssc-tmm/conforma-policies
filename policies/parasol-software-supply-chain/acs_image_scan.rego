@@ -2,6 +2,9 @@ package acs_image_scan
 
 import rego.v1
 
+# METADATA
+# title: ACS image scan task executed
+# description: Per Parasol company policy, the build must include the acs-image-scan task
 deny contains msg if {
 	every att in input.attestations {
 		not _task_ran(att, "acs-image-scan")
@@ -9,6 +12,9 @@ deny contains msg if {
 	msg := "Required task 'acs-image-scan' not found in attestation — task must run as part of the pipeline"
 }
 
+# METADATA
+# title: ACS image scan results present
+# description: Per Parasol company policy, the build must produce ACS image scan results
 deny contains msg if {
 	every att in input.attestations {
 		not _has_result(att.statement.predicate.buildConfig.results, "ACS_IMAGE_SCAN_OUTPUT")
@@ -16,6 +22,9 @@ deny contains msg if {
 	msg := "ACS image scan results not found in attestation"
 }
 
+# METADATA
+# title: No critical vulnerabilities in image
+# description: Images with critical vulnerabilities should be reviewed before production release
 warn contains msg if {
 	some att in input.attestations
 	some result in att.statement.predicate.buildConfig.results

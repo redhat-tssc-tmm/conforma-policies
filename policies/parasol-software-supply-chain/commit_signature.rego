@@ -2,6 +2,9 @@ package commit_signature
 
 import rego.v1
 
+# METADATA
+# title: Commit signature verification task executed
+# description: Per Parasol company policy, the build must include the verify-commit-signature task
 deny contains msg if {
 	every att in input.attestations {
 		not _task_ran(att, "verify-commit-signature")
@@ -9,6 +12,9 @@ deny contains msg if {
 	msg := "Required task 'verify-commit-signature' not found in attestation — task must run as part of the pipeline"
 }
 
+# METADATA
+# title: Commit signature result present
+# description: Per Parasol company policy, the build must produce a commit signature verification result
 deny contains msg if {
 	every att in input.attestations {
 		not _has_result(att.statement.predicate.buildConfig.results, "COMMIT_SIGNATURE_STATUS")
@@ -16,6 +22,9 @@ deny contains msg if {
 	msg := "Commit signature status result not found in attestation"
 }
 
+# METADATA
+# title: Commit must be signed by a developer
+# description: Per Parasol company policy, production releases require a human-signed commit
 deny contains msg if {
 	some att in input.attestations
 	some result in att.statement.predicate.buildConfig.results
@@ -24,6 +33,9 @@ deny contains msg if {
 	msg := "Commit is unsigned — production releases require a signed commit"
 }
 
+# METADATA
+# title: Bot commits cannot be promoted to production
+# description: Per Parasol company policy, automated bot commits are not acceptable for production releases
 deny contains msg if {
 	some att in input.attestations
 	some result in att.statement.predicate.buildConfig.results
