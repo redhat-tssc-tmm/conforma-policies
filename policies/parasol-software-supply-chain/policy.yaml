@@ -2,4 +2,4 @@
 sources:
   - name: parasol-software-supply-chain
     policy:
-      - "git::http://gitlab.gitlab.svc/parasol/conforma-policies.git//policies/parasol-software-supply-chain?ref=main"
+      - "git::https://gitlab-gitlab.{{ cluster_subdomain }}/parasol/conforma-policies.git//policies/parasol-software-supply-chain?ref=main"
