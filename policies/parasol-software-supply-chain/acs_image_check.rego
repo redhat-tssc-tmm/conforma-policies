@@ -20,7 +20,7 @@ deny contains msg if {
 	some att in input.attestations
 	some result in att.statement.predicate.buildConfig.results
 	result.name == "ACS_IMAGE_CHECK_STATUS"
-	result.value != "Succeeded"
+	result.value != "PASSED"
 	msg := sprintf("ACS image policy check did not pass (status: %s)", [result.value])
 }
 
