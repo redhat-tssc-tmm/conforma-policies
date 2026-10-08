@@ -1,4 +1,4 @@
-package policy.release.acs_image_scan
+package acs_image_scan
 
 import rego.v1
 

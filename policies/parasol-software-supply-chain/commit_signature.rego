@@ -1,4 +1,4 @@
-package policy.release.commit_signature
+package commit_signature
 
 import rego.v1
 

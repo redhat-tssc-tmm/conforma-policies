@@ -1,4 +1,4 @@
-package policy.release.sonarqube_quality_gate
+package sonarqube_quality_gate
 
 import rego.v1
 
