@@ -14,7 +14,10 @@ deny contains result if {
 	every att in input.attestations {
 		not _task_ran(att, "verify-commit-signature")
 	}
-	result := {"msg": "Required task 'verify-commit-signature' not found in attestation — task must run as part of the pipeline"}
+	result := {
+		"msg": "Required task 'verify-commit-signature' not found in attestation — task must run as part of the pipeline",
+		"metadata": {"code": "commit_signature.task_present"},
+	}
 }
 
 # METADATA
@@ -32,7 +35,10 @@ deny contains result if {
 	some r in task.results
 	r.name == "SIGNATURE_STATUS"
 	r.value == "UNSIGNED"
-	result := {"msg": "Commit is unsigned — production releases require a signed commit"}
+	result := {
+		"msg": "Commit is unsigned — production releases require a signed commit",
+		"metadata": {"code": "commit_signature.commit_signed"},
+	}
 }
 
 # METADATA
@@ -50,7 +56,10 @@ deny contains result if {
 	some r in task.results
 	r.name == "SIGNATURE_STATUS"
 	r.value == "BOT_COMMIT"
-	result := {"msg": "Automated bot commit cannot be promoted to production — a human-signed commit is required"}
+	result := {
+		"msg": "Automated bot commit cannot be promoted to production — a human-signed commit is required",
+		"metadata": {"code": "commit_signature.no_bot_commit"},
+	}
 }
 
 # METADATA
@@ -69,7 +78,10 @@ warn contains result if {
 	r.value == "SIGNED"
 	some d in task.results
 	d.name == "SIGNATURE_DETAILS"
-	result := {"msg": sprintf("Signed by: %s", [d.value])}
+	result := {
+		"msg": sprintf("Signed by: %v", [d.value]),
+		"metadata": {"code": "commit_signature.signer_info"},
+	}
 }
 
 _task_ran(att, name) if {

@@ -14,7 +14,10 @@ deny contains result if {
 	every att in input.attestations {
 		not _task_ran(att, "sonar-scan")
 	}
-	result := {"msg": "Required task 'sonar-scan' not found in attestation — task must run as part of the pipeline"}
+	result := {
+		"msg": "Required task 'sonar-scan' not found in attestation — task must run as part of the pipeline",
+		"metadata": {"code": "sonarqube_quality_gate.task_present"},
+	}
 }
 
 # METADATA
@@ -33,16 +36,20 @@ deny contains result if {
 	r.name == "SONAR_QUALITY_RESULT"
 	qd := json.unmarshal(r.value)
 	qd.qualityGateStatus != "OK"
-	result := {"msg": sprintf("SonarQube quality gate FAILED (status: %s, project: %s, dashboard: %s)", [qd.qualityGateStatus, qd.projectKey, qd.dashboardUrl])}
+	result := {
+		"msg": sprintf("SonarQube quality gate FAILED (status: %v, dashboard: %v)", [qd.qualityGateStatus, qd.dashboardUrl]),
+		"metadata": {"code": "sonarqube_quality_gate.quality_gate_passed"},
+	}
 }
 
 # METADATA
-# title: SonarQube analysis summary
+# title: SonarQube analysis highlights
 # description: >-
-#   Reports key SonarQube metrics from the quality gate analysis.
+#   Reports noteworthy SonarQube findings (security hotspots,
+#   bugs, vulnerabilities, or code smells).
 # custom:
-#   short_name: analysis_summary
-#   failure_msg: "SonarQube analysis summary"
+#   short_name: analysis_highlights
+#   failure_msg: "SonarQube findings"
 warn contains result if {
 	some att in input.attestations
 	some task in att.statement.predicate.buildConfig.tasks
@@ -51,7 +58,12 @@ warn contains result if {
 	r.name == "SONAR_QUALITY_RESULT"
 	qd := json.unmarshal(r.value)
 	metrics := qd.metrics
-	result := {"msg": sprintf("SonarQube: Bugs: %s, Vulnerabilities: %s, Code Smells: %s, Coverage: %s%%, Duplications: %s%%, Security Hotspots: %s", [metrics.bugs, metrics.vulnerabilities, metrics.code_smells, metrics.coverage, metrics.duplicated_lines_density, metrics.security_hotspots])}
+	notable := to_number(metrics.bugs) + to_number(metrics.vulnerabilities) + to_number(metrics.code_smells) + to_number(metrics.security_hotspots)
+	notable > 0
+	result := {
+		"msg": sprintf("SonarQube: Bugs: %v, Vulnerabilities: %v, Code Smells: %v, Security Hotspots: %v, Coverage: %v%% (report: %v)", [metrics.bugs, metrics.vulnerabilities, metrics.code_smells, metrics.security_hotspots, metrics.coverage, qd.dashboardUrl]),
+		"metadata": {"code": "sonarqube_quality_gate.analysis_highlights"},
+	}
 }
 
 # METADATA
@@ -70,7 +82,10 @@ warn contains result if {
 	qd := json.unmarshal(r.value)
 	some condition in qd.conditions
 	condition.status != "OK"
-	result := {"msg": sprintf("SonarQube condition failed: %s (value: %s, threshold: %s)", [condition.metric, condition.value, condition.threshold])}
+	result := {
+		"msg": sprintf("SonarQube condition failed: %v (value: %v, threshold: %v)", [condition.metric, condition.value, condition.threshold]),
+		"metadata": {"code": "sonarqube_quality_gate.conditions_met"},
+	}
 }
 
 _task_ran(att, name) if {

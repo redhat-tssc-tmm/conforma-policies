@@ -14,7 +14,10 @@ deny contains result if {
 	every att in input.attestations {
 		not _task_ran(att, "acs-image-scan")
 	}
-	result := {"msg": "Required task 'acs-image-scan' not found in attestation — task must run as part of the pipeline"}
+	result := {
+		"msg": "Required task 'acs-image-scan' not found in attestation — task must run as part of the pipeline",
+		"metadata": {"code": "acs_image_scan.task_present"},
+	}
 }
 
 # METADATA
@@ -34,7 +37,10 @@ warn contains result if {
 	vulns := scan.vulnerabilities
 	total := to_number(vulns.critical) + to_number(vulns.high) + to_number(vulns.medium) + to_number(vulns.low)
 	total > 0
-	result := {"msg": sprintf("Vulnerabilities found — Critical: %s, High: %s, Medium: %s, Low: %s", [vulns.critical, vulns.high, vulns.medium, vulns.low])}
+	result := {
+		"msg": sprintf("Vulnerabilities found — Critical: %v, High: %v, Medium: %v, Low: %v", [vulns.critical, vulns.high, vulns.medium, vulns.low]),
+		"metadata": {"code": "acs_image_scan.vulnerability_summary"},
+	}
 }
 
 _task_ran(att, name) if {

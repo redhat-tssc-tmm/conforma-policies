@@ -14,7 +14,10 @@ deny contains result if {
 	every att in input.attestations {
 		not _task_ran(att, "acs-image-check")
 	}
-	result := {"msg": "Required task 'acs-image-check' not found in attestation — task must run as part of the pipeline"}
+	result := {
+		"msg": "Required task 'acs-image-check' not found in attestation — task must run as part of the pipeline",
+		"metadata": {"code": "acs_image_check.task_present"},
+	}
 }
 
 # METADATA
@@ -32,7 +35,10 @@ deny contains result if {
 	some r in task.results
 	r.name == "CHECK_STATUS"
 	r.value != "PASSED"
-	result := {"msg": sprintf("ACS image policy check did not pass (status: %s)", [r.value])}
+	result := {
+		"msg": sprintf("ACS image policy check did not pass (status: %v)", [r.value]),
+		"metadata": {"code": "acs_image_check.check_passed"},
+	}
 }
 
 _task_ran(att, name) if {
