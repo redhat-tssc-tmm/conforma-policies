@@ -62,27 +62,6 @@ deny contains result if {
 	}
 }
 
-# METADATA
-# title: Commit signature verified
-# description: >-
-#   Reports the signer identity when the commit is properly signed.
-# custom:
-#   short_name: signer_info
-#   failure_msg: "Commit signer information"
-warn contains result if {
-	some att in input.attestations
-	some task in att.statement.predicate.buildConfig.tasks
-	task.name == "verify-commit-signature"
-	some r in task.results
-	r.name == "SIGNATURE_STATUS"
-	r.value == "SIGNED"
-	some d in task.results
-	d.name == "SIGNATURE_DETAILS"
-	result := {
-		"msg": sprintf("Signed by: %v", [d.value]),
-		"code": "commit_signature.signer_info",
-	}
-}
 
 _task_ran(att, name) if {
 	some task in att.statement.predicate.buildConfig.tasks
