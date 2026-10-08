@@ -16,7 +16,7 @@ deny contains result if {
 	}
 	result := {
 		"msg": "Required task 'acs-image-scan' not found in attestation — task must run as part of the pipeline",
-		"metadata": {"code": "acs_image_scan.task_present"},
+		"code": "acs_image_scan.task_present",
 	}
 }
 
@@ -39,7 +39,7 @@ warn contains result if {
 	total > 0
 	result := {
 		"msg": sprintf("Vulnerabilities found — Critical: %v, High: %v, Medium: %v, Low: %v", [vulns.critical, vulns.high, vulns.medium, vulns.low]),
-		"metadata": {"code": "acs_image_scan.vulnerability_summary"},
+		"code": "acs_image_scan.vulnerability_summary",
 	}
 }
 

@@ -16,7 +16,7 @@ deny contains result if {
 	}
 	result := {
 		"msg": "Required task 'acs-image-check' not found in attestation — task must run as part of the pipeline",
-		"metadata": {"code": "acs_image_check.task_present"},
+		"code": "acs_image_check.task_present",
 	}
 }
 
@@ -37,7 +37,7 @@ deny contains result if {
 	r.value != "PASSED"
 	result := {
 		"msg": sprintf("ACS image policy check did not pass (status: %v)", [r.value]),
-		"metadata": {"code": "acs_image_check.check_passed"},
+		"code": "acs_image_check.check_passed",
 	}
 }
 

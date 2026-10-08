@@ -16,7 +16,7 @@ deny contains result if {
 	}
 	result := {
 		"msg": "Required task 'sonar-scan' not found in attestation — task must run as part of the pipeline",
-		"metadata": {"code": "sonarqube_quality_gate.task_present"},
+		"code": "sonarqube_quality_gate.task_present",
 	}
 }
 
@@ -38,7 +38,7 @@ deny contains result if {
 	qd.qualityGateStatus != "OK"
 	result := {
 		"msg": sprintf("SonarQube quality gate FAILED (status: %v, dashboard: %v)", [qd.qualityGateStatus, qd.dashboardUrl]),
-		"metadata": {"code": "sonarqube_quality_gate.quality_gate_passed"},
+		"code": "sonarqube_quality_gate.quality_gate_passed",
 	}
 }
 
@@ -62,7 +62,7 @@ warn contains result if {
 	notable > 0
 	result := {
 		"msg": sprintf("SonarQube: Bugs: %v, Vulnerabilities: %v, Code Smells: %v, Security Hotspots: %v, Coverage: %v%% (report: %v)", [metrics.bugs, metrics.vulnerabilities, metrics.code_smells, metrics.security_hotspots, metrics.coverage, qd.dashboardUrl]),
-		"metadata": {"code": "sonarqube_quality_gate.analysis_highlights"},
+		"code": "sonarqube_quality_gate.analysis_highlights",
 	}
 }
 
@@ -84,7 +84,7 @@ warn contains result if {
 	condition.status != "OK"
 	result := {
 		"msg": sprintf("SonarQube condition failed: %v (value: %v, threshold: %v)", [condition.metric, condition.value, condition.threshold]),
-		"metadata": {"code": "sonarqube_quality_gate.conditions_met"},
+		"code": "sonarqube_quality_gate.conditions_met",
 	}
 }
 

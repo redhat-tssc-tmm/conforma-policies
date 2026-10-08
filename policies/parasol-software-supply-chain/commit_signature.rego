@@ -16,7 +16,7 @@ deny contains result if {
 	}
 	result := {
 		"msg": "Required task 'verify-commit-signature' not found in attestation — task must run as part of the pipeline",
-		"metadata": {"code": "commit_signature.task_present"},
+		"code": "commit_signature.task_present",
 	}
 }
 
@@ -37,7 +37,7 @@ deny contains result if {
 	r.value == "UNSIGNED"
 	result := {
 		"msg": "Commit is unsigned — production releases require a signed commit",
-		"metadata": {"code": "commit_signature.commit_signed"},
+		"code": "commit_signature.commit_signed",
 	}
 }
 
@@ -58,7 +58,7 @@ deny contains result if {
 	r.value == "BOT_COMMIT"
 	result := {
 		"msg": "Automated bot commit cannot be promoted to production — a human-signed commit is required",
-		"metadata": {"code": "commit_signature.no_bot_commit"},
+		"code": "commit_signature.no_bot_commit",
 	}
 }
 
@@ -80,7 +80,7 @@ warn contains result if {
 	d.name == "SIGNATURE_DETAILS"
 	result := {
 		"msg": sprintf("Signed by: %v", [d.value]),
-		"metadata": {"code": "commit_signature.signer_info"},
+		"code": "commit_signature.signer_info",
 	}
 }
 
