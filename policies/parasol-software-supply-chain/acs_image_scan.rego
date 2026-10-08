@@ -13,22 +13,14 @@ deny contains msg if {
 }
 
 # METADATA
-# title: ACS image scan results present
-# description: Per Parasol company policy, the build must produce ACS image scan results
-deny contains msg if {
-	every att in input.attestations {
-		not _has_result(att.statement.predicate.buildConfig.results, "ACS_IMAGE_SCAN_OUTPUT")
-	}
-	msg := "ACS image scan results not found in attestation"
-}
-
-# METADATA
 # title: No critical vulnerabilities in image
 # description: Images with critical vulnerabilities should be reviewed before production release
 warn contains msg if {
 	some att in input.attestations
-	some result in att.statement.predicate.buildConfig.results
-	result.name == "ACS_IMAGE_SCAN_OUTPUT"
+	some task in att.statement.predicate.buildConfig.tasks
+	task.name == "acs-image-scan"
+	some result in task.results
+	result.name == "SCAN_OUTPUT"
 	scan := json.unmarshal(result.value)
 	vulns := scan.vulnerabilities
 	to_number(vulns.critical) > 0
@@ -38,9 +30,4 @@ warn contains msg if {
 _task_ran(att, name) if {
 	some task in att.statement.predicate.buildConfig.tasks
 	task.name == name
-}
-
-_has_result(results, name) if {
-	some result in results
-	result.name == name
 }

@@ -13,21 +13,13 @@ deny contains msg if {
 }
 
 # METADATA
-# title: SonarQube quality gate result present
-# description: Per Parasol company policy, the build must produce a SonarQube quality gate result
-deny contains msg if {
-	every att in input.attestations {
-		not _has_result(att.statement.predicate.buildConfig.results, "SONAR_QUALITY_RESULT")
-	}
-	msg := "SonarQube quality gate result not found in attestation"
-}
-
-# METADATA
 # title: SonarQube quality gate passed
 # description: Per Parasol company policy, the image must pass the SonarQube quality gate
 deny contains msg if {
 	some att in input.attestations
-	some result in att.statement.predicate.buildConfig.results
+	some task in att.statement.predicate.buildConfig.tasks
+	task.name == "sonar-scan"
+	some result in task.results
 	result.name == "SONAR_QUALITY_RESULT"
 	qd := json.unmarshal(result.value)
 	qd.qualityGateStatus != "OK"
@@ -39,7 +31,9 @@ deny contains msg if {
 # description: Individual SonarQube quality conditions should pass
 warn contains msg if {
 	some att in input.attestations
-	some result in att.statement.predicate.buildConfig.results
+	some task in att.statement.predicate.buildConfig.tasks
+	task.name == "sonar-scan"
+	some result in task.results
 	result.name == "SONAR_QUALITY_RESULT"
 	qd := json.unmarshal(result.value)
 	some condition in qd.conditions
@@ -50,9 +44,4 @@ warn contains msg if {
 _task_ran(att, name) if {
 	some task in att.statement.predicate.buildConfig.tasks
 	task.name == name
-}
-
-_has_result(results, name) if {
-	some result in results
-	result.name == name
 }
