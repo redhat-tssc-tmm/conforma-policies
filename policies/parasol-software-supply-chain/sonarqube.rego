@@ -63,6 +63,7 @@ warn contains result if {
 	result := {
 		"msg": sprintf("SonarQube: Bugs: %v, Vulnerabilities: %v, Code Smells: %v, Security Hotspots: %v, Coverage: %v%% (report: %v)", [metrics.bugs, metrics.vulnerabilities, metrics.code_smells, metrics.security_hotspots, metrics.coverage, qd.dashboardUrl]),
 		"code": "sonarqube_quality_gate.analysis_highlights",
+		"solution": "The attested SonarQube scan during the release build has shown some code-level issues that need to be dealt with. Please consult with application development.",
 	}
 }
 

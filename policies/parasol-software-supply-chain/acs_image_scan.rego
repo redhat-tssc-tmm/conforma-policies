@@ -40,6 +40,7 @@ warn contains result if {
 	result := {
 		"msg": sprintf("Vulnerabilities found — Critical: %v, High: %v, Medium: %v, Low: %v", [vulns.critical, vulns.high, vulns.medium, vulns.low]),
 		"code": "acs_image_scan.vulnerability_summary",
+		"solution": "The attested ACS scan during the release build has shown some vulnerabilities that need to be dealt with. Please consult with application development (for code level issues) and Platform Engineering (for base-image related issues). You can also check the ACS console and TPA via the RHDH links.",
 	}
 }
 
