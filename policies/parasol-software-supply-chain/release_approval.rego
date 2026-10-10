@@ -58,8 +58,8 @@ deny contains result if {
 # METADATA
 # title: Parasol Release Approved
 # description: >-
-#   Per Parasol company policy, the latest release approval
-#   must indicate approval. Rejected releases cannot be promoted.
+#   In accordance with Parasol company policy, final signed
+#   authorization is mandatory for the release promotion.
 # custom:
 #   short_name: release_approved
 #   failure_msg: "Release was rejected"
@@ -71,5 +71,6 @@ deny contains result if {
 	result := {
 		"msg": sprintf("Release rejected by %v — reason: %v", [decision.approver, reason_short]),
 		"code": "release_approval.release_approved",
+		"solution": "Submit a new approval via the Release Approval process in the RHDH component links.",
 	}
 }
